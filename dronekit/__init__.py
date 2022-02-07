@@ -1251,12 +1251,16 @@ class Vehicle(HasObservers):
             # ignore groundstations
             if m.type == mavutil.mavlink.MAV_TYPE_GCS:
                 return
+            if m.type != 14:
+                # Octocopter messages only! https://mavlink.io/en/messages/common.html#MAV_TYPE_OCTOROTOR
+                return
             self._armed = (m.base_mode & mavutil.mavlink.MAV_MODE_FLAG_SAFETY_ARMED) != 0
             self.notify_attribute_listeners('armed', self.armed, cache=True)
             self._autopilot_type = m.autopilot
             self._vehicle_type = m.type
             if self._is_mode_available(m.custom_mode, m.base_mode) is False:
-                raise APIException("mode (%s, %s) not available on mavlink definition" % (m.custom_mode, m.base_mode))
+                pass
+                # raise APIException("mode (%s, %s) not available on mavlink definition" % (m.custom_mode, m.base_mode))
             if self._autopilot_type == mavutil.mavlink.MAV_AUTOPILOT_PX4:
                 self._flightmode = mavutil.interpret_px4_mode(m.base_mode, m.custom_mode)
             else:
