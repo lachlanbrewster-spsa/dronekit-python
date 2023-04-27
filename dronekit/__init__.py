@@ -3101,8 +3101,6 @@ class CommandSequence(object):
 
         last_request_time = time.time()
 
-        self._wp_downloading = True
-
         if self._vehicle._wpts_dirty:
             self._vehicle._master.waypoint_clear_all_send()
             start_time = time.time()
@@ -3111,26 +3109,19 @@ class CommandSequence(object):
                 self._vehicle._master.waypoint_count_send(self._vehicle._wploader.count())
                 while False in self._vehicle._wp_uploaded:
 
-                    print(self._vehicle._wp_uploaded)
+                    # print(self._vehicle._wp_uploaded)
 
-                    if time.time() - last_request_time >= 0.5:  # and time.time() - start_time >= 5:
-                        # Re-request next mission item to keep up with the rest items
-                        if not self._vehicle._wploader.wpoints:
-                            # if none of the items did not arrive
-                            seq = 0
-                        else:
-                            seq = self._vehicle._wploader.wpoints[-1].seq + 1
-
-                        # self._wp_request_timestamp = time.time()
-                        self._vehicle._master.waypoint_request_send(seq)
+                    if time.time() - last_request_time >= 2 and time.time() - start_time >= 5:
+                        last_request_time = time.time()
+                        self._vehicle._master.waypoint_count_send(self._vehicle._wploader.count())
 
                     if timeout and time.time() - start_time > timeout:
-                        self._wp_downloading = False
                         raise TimeoutError
                     time.sleep(0.1)
+
                 self._vehicle._wp_uploaded = None
             self._vehicle._wpts_dirty = False
-            self._vehicle._wp_downloading = False
+
 
     # def upload(self, timeout=None):
     #     """
