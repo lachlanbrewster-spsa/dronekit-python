@@ -55,6 +55,9 @@ from pymavlink.dialects.v10 import ardupilotmega
 
 from dronekit.util import ErrprinterHandler
 
+# For Arducopter
+FLIGHT_MODE_MAPPING = {'STABILIZE': 0, 'ACRO': 1, 'ALT_HOLD': 2, 'AUTO': 3, 'GUIDED': 4, 'LOITER': 5, 'RTL': 6, 'CIRCLE': 7, 'POSITION': 8, 'LAND': 9, 'OF_LOITER': 10, 'DRIFT': 11, 'SPORT': 13, 'FLIP': 14, 'AUTOTUNE': 15, 'POSHOLD': 16, 'BRAKE': 17, 'THROW': 18, 'AVOID_ADSB': 19, 'GUIDED_NOGPS': 20, 'SMART_RTL': 21, 'FLOWHOLD': 22, 'FOLLOW': 23, 'ZIGZAG': 24, 'SYSTEMID': 25, 'AUTOROTATE': 26, 'AUTO_RTL': 27}
+
 
 class APIException(Exception):
     """
@@ -1686,7 +1689,7 @@ class Vehicle(HasObservers):
         elif isinstance(v, int):
             self._master.set_mode(v)
         else:
-            self._master.set_mode(self._mode_mapping[v.name])
+            self._master.set_mode(FLIGHT_MODE_MAPPING[v.name])
 
     @property
     def location(self):
